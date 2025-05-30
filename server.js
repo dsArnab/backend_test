@@ -9,13 +9,18 @@ const PORT = 8080;
 app.use(express.json());
 
 const loadUsers = () =>{
-    if (!fstat.existsSync('users.json')){
-        fstat.writeFileSync('users.json', JSON.stringify([]));
+    if (!fs.existsSync('users.json')){
+        fs.writeFileSync('users.json', JSON.stringify([]));
     }
     const data = fs.readFileSync('users.json');
     return JSON.parse(data);
-}
-const isValidEmail = (email) => /^[^\$@]+@[^\$@]+\.[^\$@]+$/.test(email);
+};
+
+const saveUsers = (users) => {
+    fs.writeFileSync('users.json', JSON.stringify(users, null, 2));
+};
+
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 app.post('/register', async (req, res) => {
     const {username, email, password} = req.body;
@@ -26,7 +31,7 @@ app.post('/register', async (req, res) => {
     if (!isValidEmail(email)){
         return res.status(400).json({message: 'Invalid email format'});
     }
-    if (password.length <8) {
+    if (password.length < 8) {
         return res.status(400).json({message: 'Password must be at least 8 characters'});
     }
 
@@ -56,5 +61,5 @@ app.post('/register', async (req, res) => {
 });
 
 app.listen(PORT, () =>{
-    console.log ('Server is running at http://localhost:8080');
+    console.log (`Server is running at http://localhost:${PORT}`);
 });
